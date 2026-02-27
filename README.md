@@ -1,70 +1,132 @@
-# Getting Started with Create React App
+# Skill Roadmap Builder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web app to create and manage learning roadmaps. You can create a roadmap (e.g. "Learn React"), add ordered steps to it, reorder them, edit or delete them — all saved in a database.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Tech Stack
 
-### `npm start`
+| Layer            | Tech                            |
+|------------------|---------------------------------|
+| Frontend         | React 19 + Vite                 |
+| Backend          | Node.js + Express               |
+| Database         | MongoDB (Mongoose)              |
+| Containerization | Docker + Docker Compose         |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## How It Works
 
-### `npm test`
+```
+Browser → React Frontend (port 5173)
+              ↓  HTTP API calls
+        Express Backend (port 5001)
+              ↓  Mongoose
+           MongoDB (port 27017)
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. The frontend fetches roadmaps from the backend REST API.
+2. The backend handles CRUD for roadmaps and their steps.
+3. Data is stored in MongoDB.
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## API Endpoints
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Method | Endpoint                              | What it does         |
+|--------|---------------------------------------|----------------------|
+| GET    | `/api/roadmaps`                       | List all roadmaps    |
+| POST   | `/api/roadmaps`                       | Create a roadmap     |
+| GET    | `/api/roadmaps/:id`                   | Get one roadmap      |
+| PUT    | `/api/roadmaps/:id`                   | Update a roadmap     |
+| DELETE | `/api/roadmaps/:id`                   | Delete a roadmap     |
+| POST   | `/api/roadmaps/:id/steps`             | Add a step           |
+| PUT    | `/api/roadmaps/:id/steps/reorder`     | Reorder steps        |
+| PUT    | `/api/roadmaps/:roadmapId/steps/:stepId`  | Update a step    |
+| DELETE | `/api/roadmaps/:roadmapId/steps/:stepId` | Delete a step    |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## Project Structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+Skill/
+├── backend/
+│   ├── controllers/    # Route logic
+│   ├── models/         # Mongoose schemas
+│   ├── routes/         # Express routes
+│   ├── server.js       # Entry point
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   │   ├── components/ # React components
+│   │   ├── hooks/      # Custom hooks
+│   │   ├── api.js      # API call helpers
+│   │   └── App.jsx
+│   └── Dockerfile
+└── docker-compose.yml
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Run with Docker (Recommended)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+> Requires [Docker Desktop](https://www.docker.com/products/docker-desktop) installed.
 
-## Learn More
+```bash
+# 1. Clone the repo
+git clone <https://github.com/Arundhathi27/landing_page.git>
+cd Skill
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# 2. Build and start all services
+docker compose up --build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+That's it. Open your browser:
 
-### Code Splitting
+- **Frontend** → http://localhost:5173
+- **Backend API** → http://localhost:5001/api/roadmaps
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+# Stop everything
+docker compose down
 
-### Analyzing the Bundle Size
+# Stop and wipe database
+docker compose down -v
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## Run Locally (Without Docker)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Prerequisites
+- Node.js 18+
+- MongoDB running locally
 
-### Advanced Configuration
+### Backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+cd backend
+npm install
+```
 
-### Deployment
+Create a `.env` file in `backend/`:
+```
+PORT=5001
+MONGODB_URI=mongodb://localhost:27017/learning-path-builder
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+npm start
+# or for hot reload:
+npm run dev
+```
 
-### `npm run build` fails to minify
+### Frontend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173

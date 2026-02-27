@@ -1,0 +1,50 @@
+services:
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    container_name: skill_mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - skill_network
+
+  # Node.js / Express Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skill_backend
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - MONGODB_URI=mongodb://mongo:27017/learning-path-builder
+    depends_on:
+      - mongo
+    networks:
+      - skill_network
+
+  # React / Vite Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: skill_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - skill_network
+
+# Named volume to persist MongoDB data across restarts
+volumes:
+  mongo_data:
+
+# Internal network connecting all services
+networks:
+  skill_network:
+    driver: bridge
